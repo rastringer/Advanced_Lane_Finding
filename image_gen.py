@@ -1,7 +1,7 @@
 
 '''
 With great thanks to Udacity Content Developer Aaron Brown for his excellent YouTube tutorial for this project at http://bit.ly/2kdGX8d
-This project is a condensed version of his more extensive project
+This project is a condensed version of his more extensive (and superior) work
 '''
 
 import numpy as np
