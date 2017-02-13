@@ -43,11 +43,9 @@ Undistorted
 ###Pipeline (single images)
 
 We can now apply the distortion to one of the test images from the road lane we are interested in for this project. Here's the original image:
-
 ![alt text][image3]
 
 Here's the undistorted image. Notice the view of the white car to the right of the screen:
-
 ![alt text][image4]
 
 **Binary color transform
