@@ -3,15 +3,15 @@
 
 [image1]: ./camera_cal/calibration1.jpg "Distorted"
 [image2]: ./camera_cal/calibration_completed1.jpg "Undistorted"
-[image3]: ./test_images/test1.jpg"Test"
-[image4]: ./test_images/tracked0.jpg"Tracked"
+[image3]: ./test_images/test1.jpg "Test"
+[image4]: ./test_images/tracked0.jpg "Tracked"
 [image5]:  ./test_images/tracked_binary0.jpg "Binary Color"
 [image6]:  ./test_images/first_warp0.jpg "Perspective Transform"
 [image7]:  ./test_images/first_warp0.jpg "Line Pixels"
-[image8]: ./test_images/road_tracked0 "Tracking Lanes"
-[image9]: ./test_images/road_tracked1 "Tracking Lanes"
-[image10]: ./test_images/warped0 "Windows"
-[image11]: ./test_images/warped1 "Windows"
+[image8]: ./test_images/road_tracked0.jpg "Tracking Lanes"
+[image9]: ./test_images/road_tracked1.jpg "Tracking Lanes"
+[image10]: ./test_images/warped0.jpg "Windows"
+[image11]: ./test_images/warped1.jpg "Windows"
 [image12]:  ./test_images/road_warped0.jpg "Lane Curvature"
 [image13]:  ./test_images/road_warped1.jpg "Lane Curvature"
 
@@ -26,11 +26,7 @@
 
 ###Camera Calibration
 
-####1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
-
-The code for this step is contained in the first code cell of the IPython notebook located in "./examples/example.ipynb" (or in lines # through # of the file called `some_file.py`). 
-
-In the 'camera_cal' folder, we add a camera_cal.py file to 
+The 'camera_cal' folder contais a camera_cal.py file to 
 distort the images and learn the distortion coefficients to employ with OpenCV's 'cv2.undistort()' function.
 
 Firstly, we create two arrays in which to store the coordinated of the chessboard corners. We will apend 'objpoints' each time we detect all corners in test images of chessboards, and add the (x, y) pixel position of the corners to 'imgpoints'.
