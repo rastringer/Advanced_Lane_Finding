@@ -43,7 +43,7 @@ Here's the undistorted image. Notice the view of the white car to the right of t
 
 ![alt text][image4]
 
-**Binary color transform
+###Binary color transform
 
 To process the test images into thresholded binary images, I use a combination of color and gradient threshold methods. These techniques take us beyond a simple edge detection and allow us to find which lines are more likely to be lanes based on their length and curvature.
 To this end, we use Sobel operators to take the derivative of the image in the x or y direction.
