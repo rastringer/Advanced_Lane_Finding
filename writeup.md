@@ -226,19 +226,19 @@ I then fit polynomials to decide which of the lines marked in the processed imag
 	curverad = ((1 + (2*curve_fit_cr[0]*yvals[1]*ym_per_pix + curve_fit_cr[1])**2)**1.5) /np.absolute(2*curve_fit_cr[0])
 ```
 Coloring left lane blue and right lane red 
-[image8]: ./test_images/road_tracked0 "Tracking Lanes"
+![alt text][image8]
 
-[image9]: ./test_images/road_tracked1 "Tracking Lanes"
+![alt text][image9]
 
 Adding windows to track lane line
-[image10]: ./test_images/warped0 "Windows"
+![alt text][image10]
 
-[image11]: ./test_images/warped1 "Windows"
+![alt text][image11]
 
 Overlaying curvature onto image
-[image12]:  ./test_images/road_warped0.jpg "Lane Curvature"
+![alt text][image12]
 
-[image13]:  ./test_images/road_warped1.jpg "Lane Curvature"
+![alt text][image13]
 
 
 ###Pipeline (video)
