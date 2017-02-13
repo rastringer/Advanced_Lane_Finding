@@ -1,21 +1,4 @@
-##Writeup Template
-###You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
----
-
-**Advanced Lane Finding Project**
-
-The goals / steps of this project are the following:
-
-* Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
-* Apply a distortion correction to raw images.
-* Use color transforms, gradients, etc., to create a thresholded binary image.
-* Apply a perspective transform to rectify binary image ("birds-eye view").
-* Detect lane pixels and fit to find the lane boundary.
-* Determine the curvature of the lane and vehicle position with respect to center.
-* Warp the detected lane boundaries back onto the original image.
-* Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
-
+##Writeup 
 [//]: # (Image References)
 
 [image1]: ./camera_cal/calibration1.jpg "Distorted"
@@ -24,9 +7,13 @@ The goals / steps of this project are the following:
 [image4]: ./test_images/tracked0.jpg"Tracked"
 [image5]:  ./test_images/tracked_binary0.jpg "Binary Color"
 [image6]:  ./test_images/first_warp0.jpg "Perspective Transform"
-[image7]:  ./test_images/warped0.jpg "Line Pixels"
-[image8]:  ./test_images/road_warped0.jpg "Lane Curvature"
-[image9]:  ./test_images/road_warped1.jpg "Lane Curvature"
+[image7]:  ./test_images/first_warp0.jpg "Line Pixels"
+[image8]: ./test_images/road_tracked0 "Tracking Lanes"
+[image9]: ./test_images/road_tracked1 "Tracking Lanes"
+[image10]: ./test_images/warped0 "Windows"
+[image11]: ./test_images/warped1 "Windows"
+[image12]:  ./test_images/road_warped0.jpg "Lane Curvature"
+[image13]:  ./test_images/road_warped1.jpg "Lane Curvature"
 
 
 [image3]: ./examples/binary_combo_example.jpg "Binary Example"
@@ -35,10 +22,6 @@ The goals / steps of this project are the following:
 [image6]: ./examples/example_output.jpg "Output"
 [video1]: ./project_video.mp4 "Video"
 
-## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
-###Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
-
----
 ###Writeup / README
 
 ###Camera Calibration
@@ -54,7 +37,10 @@ Firstly, we create two arrays in which to store the coordinated of the chessboar
 
 Here we can see the difference between the images. The first is distorted, with a slight bends around the edges of the image. The second image shows the undistorted picture of the board. 
 
+Distorted
 ![alt text][image1]
+
+Undistorted
 ![alt text][image2]
 
 
@@ -85,7 +71,7 @@ def abs_sobel_thresh(img, orient='x', sobel_kernel=3, thresh=(0, 255)):
     # Apply threshold
     binary_output[(scaled_sobel >= thresh[0]) & (scaled_sobel <= thresh[1])] = 1
     return binary_output
-'''
+```
 
 Then we apply an overall threshold to the magnitude of the gradient.
 
@@ -102,7 +88,7 @@ def mag_thresh(image, sobel_kernel=3, mag_thresh=(0, 255)):
     # Apply threshold
     binary_output[(gradmag >= mag_thresh[0]) & (gradmag <= mag_thresh[1])] = 1
     return binary_output
-''' 
+```
 
 We then work up directional thresholds to allow the program to docus on detecting lane lines rather than all lines (other cars, bridges, traffic features etc). 
 
@@ -118,24 +104,13 @@ def dir_threshold(image, sobel_kernel=3, thresh=(0, np.pi/2)):
         # Apply threshold
         binary_output[(absgraddir >= thresh[0]) & (absgraddir <= thresh[1])] = 1
     return binary_output
-'''
+```
 
 In the above code, we calculate the direction as the arctangent of the y-gradient divided by the x-gradient. 
 
 Here is the image from test1 converted to the binary threshold using the above code segments:
 
 ![alt text][image5]
-
-
-
-
-####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
-
-####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
-
-** Perspective transform
-![alt text][image6]
 
 We then use OpenCV methods to convert the RGB images to HLS, which affords greater distinction between features in an image due to the lightness and saturation of pixels.
 
@@ -154,7 +129,7 @@ def color_threshold(image, sthresh=(0,255), vthresh=(0,255)):
 	output = np.zeros_like(s_channel)
 	output[(s_binary == 1) & (v_binary == 1)] = 1
 	return output
-'''
+```
 
 A mask then focuses the image in the center of the picture, disgarding some of the dashboard and the sky.
 
@@ -163,7 +138,7 @@ def window_mask(width, height, img_ref, center,level):
 		output = np.zeros_like(img_ref)
 		output[int(img_ref.shape[0]-(level+1)*height):int(img_ref.shape[0]-level*height),max(0,int(center-width)):min(int(center+width),img_ref.shape[1])] = 1
 		return output
-'''
+```
 
 The next major stage for image processing is to warp the image. This means we take the view of the road ahead, and make it stand upright, as if we were looking at the road from a bird's eye view. This of course should make our lane detection more accurate, since the lines run from top to bottom, rather than into the distance.
 
@@ -190,29 +165,11 @@ result = warped
 write_name = './test_images/first_warp'+str(idx)+'.jpg'
 cv2.imwrite(write_name, result)
 
-'''
+```
 
 The warp function results in an image like this:
 
 ![alt text][image7]
-
-
-####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
-
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
-
-![alt text][image7]
-
-####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
-
-I did this in lines # through # in my code in `my_other_file.py`
-
-####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
-
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
-
-![alt text][image6]
-
 
 I then fit polynomials to decide which of the lines marked in the processed image are part of the left and right lanes. Overlaying windows onto the left and right lane pixels helps us to track the lines from the bottom to the top of the image.
 
@@ -267,9 +224,22 @@ I then fit polynomials to decide which of the lines marked in the processed imag
 
 	curve_fit_cr = np.polyfit(np.array(res_yvals,np.float32)*ym_per_pix, np.array(leftx,np.float32)*xm_per_pix, 2)
 	curverad = ((1 + (2*curve_fit_cr[0]*yvals[1]*ym_per_pix + curve_fit_cr[1])**2)**1.5) /np.absolute(2*curve_fit_cr[0])
+```
+Coloring left lane blue and right lane red 
+[image8]: ./test_images/road_tracked0 "Tracking Lanes"
 
+[image9]: ./test_images/road_tracked1 "Tracking Lanes"
 
-'''
+Adding windows to track lane line
+[image10]: ./test_images/warped0 "Windows"
+
+[image11]: ./test_images/warped1 "Windows"
+
+Overlaying curvature onto image
+[image12]:  ./test_images/road_warped0.jpg "Lane Curvature"
+
+[image13]:  ./test_images/road_warped1.jpg "Lane Curvature"
+
 
 ###Pipeline (video)
 
@@ -280,7 +250,7 @@ Here's a [link to my video result](./output1_tracked.mp4)
 ---
 
 ###Discussion
-
-#### While the pipeline works well on the video shown, the lanes are generally progressing forwards and to the left. Further work and flexibility will be necessary for the algorithm to accurately pick up quickly changing right and left swerves in lines on the road. 
+ 
+While the pipeline works well on the video shown, the lanes are generally progressing forwards and to the left. Further work and flexibility will be necessary for the algorithm to accurately pick up quickly changing right and left swerves in lines on the road. 
 
 This was a challenging project. I found working out some of the mathematics involved in Python took a lot of research, and making sure the various image processing techniques could do their work, pass the image on to the next processing function, took a fair amount of effort with plenty of bug fixing.
