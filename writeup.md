@@ -249,4 +249,4 @@ Here's a [link to my video result](./output1_tracked.mp4)
  
 While the pipeline works well on the video shown, the lanes are generally progressing forwards and to the left. Further work and flexibility will be necessary for the algorithm to accurately pick up quickly changing right and left swerves in lines on the road. 
 
-This was a challenging project. I found working out some of the mathematics involved in Python took a lot of research, and making sure the various image processing techniques could do their work, pass the image on to the next processing function, took a fair amount of effort with plenty of bug fixing.
+This was a challenging project. I found working out some of the mathematics involved in Python took a lot of research, and making sure the various image processing techniques could do their work, pass the image on to the next processing function, took a fair amount of effort with plenty of bug fixing. However, this was a fun and very engaging project, preceeded by some great lessons in computer vision. Thank you Udacity. Avanti!
