@@ -15,7 +15,7 @@ dist_pickle = pickle.load( open( "camera_cal/calibration__pickle.p", "rb" ) )
 mtx = dist_pickle["mtx"]
 dist = dist_pickle["dist"]
 
-# Useful functions for producing the binary pixel of interest images to feed into the LaneTracker Algorithm
+# Useful functions for producing the binary pixel of interest images 
 def abs_sobel_thresh(img, orient='x', sobel_kernel=3, thresh=(0, 255)):
     # Calculate directional gradient
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -90,17 +90,23 @@ for idx, fname in enumerate(images):
 	c_binary = color_threshold(img, sthresh=(100,255), vthresh=(200,255)) 
 	preprocessImage[((gradx == 1) & (grady == 1) | (c_binary == 1) )] = 255
 
-	result = preprocessImage
+	result = img
 
 	write_name = './test_images/tracked'+str(idx)+'.jpg'
 	cv2.imwrite(write_name, result)
 
+	result = preprocessImage
+
+	write_name = './test_images/tracked_binary'+str(idx)+'.jpg'
+	cv2.imwrite(write_name, result)
+
+
 
 	# work on defining perspective transformation area
 	img_size = (img.shape[1],img.shape[0])
-	bot_width = .76 # percent of bottom trapizoid height
-	mid_width = .16 # percent of middle trapizoid height
-	height_pct = .66 # percent for trapizoid height -- sets extent of range down the road
+	bot_width = .75 # percent of bottom trapizoid height
+	mid_width = .15 # percent of middle trapizoid height
+	height_pct = .65 # percent for trapizoid height -- sets extent of range down the road
 	bottom_trim = .935 # percent from top to bottom to avoid car hood 
 	src = np.float32([[img.shape[1]*(.5-mid_width/2),img.shape[0]*height_pct],[img.shape[1]*(.5+mid_width/2),img.shape[0]*height_pct],[img.shape[1]*(.5+bot_width/2),img.shape[0]*bottom_trim],[img.shape[1]*(.5-bot_width/2),img.shape[0]*bottom_trim]])
 	offset = img_size[0]*.25

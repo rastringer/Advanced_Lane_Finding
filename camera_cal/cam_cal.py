@@ -52,7 +52,7 @@ ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, img_siz
 
 
 dst = cv2.undistort(img, mtx, dist, None, mtx)
-cv2.imwrite('calibration1.jpg',dst)
+cv2.imwrite('calibration_completed1.jpg',dst)
 
 # Save the camera calibration result for later use (we won't worry about rvecs / tvecs)
 dist_pickle = {}
