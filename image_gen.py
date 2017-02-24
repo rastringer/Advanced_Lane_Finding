@@ -155,7 +155,7 @@ for idx, fname in enumerate(images):
 	zero_channel = np.zeros_like(template) # create zero color channel
 	template = np.array(cv2.merge((zero_channel,template,zero_channel)),np.uint8) # make window pixels green
 	warpage = np.array(cv2.merge((warped,warped,warped)),np.uint8) # make original road pixels 3 color channels
-	result = cv2.addWeighted(warpage, 1, template, 0.5, 0.0) # overlay the original road image with window results
+	result = cv2.addWeighted(warpage, 0.2, template, 0.75, 0.0) # overlay the original road image with window results
 
 	# Fit curves to images
 	# fit the lane boundaries to the left,right center positions found
@@ -163,12 +163,12 @@ for idx, fname in enumerate(images):
 
 	res_yvals = np.arange(warped.shape[0]-(window_height/2),0,-window_height)
 
-	left_fit = np.polyfit(res_yvals, leftx, 2)
-	left_fitx = left_fit[0]*yvals*yvals + left_fit[1]*yvals + left_fit[2]
+	left_fit = np.polyfit(res_yvals, leftx, 3)
+	left_fitx = left_fit[0]*yvals*yvals*yvals + left_fit[1]*yvals*yvals + left_fit[2]*yvals+left_fit[3]
 	left_fitx = np.array(left_fitx,np.int32)
 	
-	right_fit = np.polyfit(res_yvals, rightx, 2)
-	right_fitx = right_fit[0]*yvals*yvals + right_fit[1]*yvals + right_fit[2]
+	right_fit = np.polyfit(res_yvals, rightx, 3)
+	right_fitx = right_fit[0]*yvals*yvals*yvals + right_fit[1]*yvals*yvals + right_fit[2]*yvals+right_fit[3]	
 	right_fitx = np.array(right_fitx,np.int32)
 
 	# used to format everything so its ready for cv2 draw functions
@@ -187,8 +187,8 @@ for idx, fname in enumerate(images):
 	road_warped = cv2.warpPerspective(road,Minv,img_size,flags=cv2.INTER_LINEAR)
 	road_warped_bkg = cv2.warpPerspective(road_bkg,Minv,img_size,flags=cv2.INTER_LINEAR)
 
-	base = cv2.addWeighted(img, 1.0, road_warped_bkg, -1.0, 0.0)
-	result = cv2.addWeighted(base, 1.0, road_warped, 1.0, 0.0)
+	base = cv2.addWeighted(img, 1.0, road_warped_bkg, -0.6, 0.0)
+	result = cv2.addWeighted(base, 1.0, road_warped, 0.9, 0.0)
 
 	ym_per_pix = curve_centers.ym_per_pix # meters/pixel in y dimension
 	xm_per_pix = curve_centers.xm_per_pix # meters/pixel in x dimension

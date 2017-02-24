@@ -17,6 +17,49 @@ dist_pickle = pickle.load( open( "camera_cal/calibration__pickle.p", "rb" ) )
 mtx = dist_pickle["mtx"]
 dist = dist_pickle["dist"]
 
+def image_only_yellow_white(image):
+    # setup inRange to mask off everything except white and yellow
+    lower_yellow_white = np.array([140, 140, 64])
+    upper_yellow_white = np.array([255, 255, 255])
+    mask = cv2.inRange(image, lower_yellow_white, upper_yellow_white)
+    return cv2.bitwise_and(image, image, mask=mask)
+
+## Define a function that applies Gaussian Noise kernel
+def gaussian_blur(img, kernel_size):
+    return cv2.GaussianBlur(img, (kernel_size, kernel_size), 0)
+
+## Define a function that applies Canny transform
+def canny(img, low_threshold, high_threshold, kernel_size):
+    img = image_only_yellow_white(img)
+    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    blur_gray = gaussian_blur(gray, kernel_size)
+    return cv2.Canny(blur_gray, low_threshold, high_threshold)
+
+# create a region of interest mask
+def region_of_interest(img, vertices):
+    """
+    Applies an image mask.
+    Only keeps the region of the image defined by the polygon
+    formed from `vertices`. The rest of the image is set to black.
+    """
+    #defining a blank mask to start with
+    mask = np.zeros_like(img)
+
+    #defining a 3 channel or 1 channel color to fill the mask with depending on the input image
+    if len(img.shape) > 2:
+        channel_count = img.shape[2]  # i.e. 3 or 4 depending on your image
+        ignore_mask_color = (255,) * channel_count
+    else:
+        ignore_mask_color = 255
+
+    #filling pixels inside the polygon defined by "vertices" with the fill color
+    cv2.fillPoly(mask, vertices, ignore_mask_color)
+
+    #returning the image only where mask pixels are nonzero
+    masked_image = cv2.bitwise_and(img, mask)
+    return masked_image
+
+
 # Useful functions for producing the binary pixel of interest images to feed into the LaneTracker Algorithm
 def abs_sobel_thresh(img, orient='x', sobel_kernel=3, thresh=(0, 255)):
     # Calculate directional gradient
@@ -77,11 +120,17 @@ def window_mask(width, height, img_ref, center,level):
 		return output
 
 
+def weighted_img(img, initial_img, α=0.8, β=1., λ=0.):
+	return cv2.addWeighted(initial_img, α, img, β, λ) 
+
+
 def process_image(image):
 
 	# undistort the image
 	img = cv2.undistort(image,mtx,dist,None,mtx)
-
+	# mask calculations
+	imshape = img.shape
+	
 	# process image and generate binary pixel of interests
 	preprocessImage = np.zeros_like(img[:,:,0])
 	gradx = abs_sobel_thresh(img, orient='x', thresh=(25,255)) # 12
@@ -89,12 +138,17 @@ def process_image(image):
 	c_binary = color_threshold(img, sthresh=(100,255), vthresh=(200,255)) 
 	preprocessImage[((gradx == 1) & (grady == 1) | (c_binary == 1) )] = 255
 
+	# Order of array: bottom_x1, bottom_y1; top_x1, top_y2; top_x2, y_top; bottom_x2, bottom_y2
+	vertices = np.array([[(0, imshape[0]), (imshape[1]*14/32, imshape[0]*9/16), (imshape[1]*16/32, imshape[0]*9/16), (imshape[1], imshape[0])]], dtype=np.int32)
+	masked_edges = region_of_interest(preprocessImage, vertices)
+
 	# work on defining perspective transformation area
 	img_size = (img.shape[1],img.shape[0])
 	bot_width = .76 # percent of bottom trapizoid height
-	mid_width = .16 # percent of middle trapizoid height
-	height_pct = .66 # percent for trapizoid height -- sets extent of range down the road
+	mid_width = .1 # percent of middle trapizoid height
+	height_pct = .63 # percent for trapizoid height -- sets extent of range down the road
 	bottom_trim = .935 # percent from top to bottom to avoid car hood 
+
 	src = np.float32([[img.shape[1]*(.5-mid_width/2),img.shape[0]*height_pct],[img.shape[1]*(.5+mid_width/2),img.shape[0]*height_pct],[img.shape[1]*(.5+bot_width/2),img.shape[0]*bottom_trim],[img.shape[1]*(.5-bot_width/2),img.shape[0]*bottom_trim]])
 	offset = img_size[0]*.25
 	dst = np.float32([[offset, 0], [img_size[0]-offset, 0],[img_size[0]-offset, img_size[1]], [offset ,img_size[1]]])
@@ -102,13 +156,13 @@ def process_image(image):
 	# perform the transform
 	M = cv2.getPerspectiveTransform(src,dst)
 	Minv = cv2.getPerspectiveTransform(dst,src)
-	warped = cv2.warpPerspective(preprocessImage,M,img_size,flags=cv2.INTER_LINEAR)
+	warped = cv2.warpPerspective(masked_edges,M,img_size,flags=cv2.INTER_LINEAR)
 
 	window_width = 25
 	window_height = 80
 
 	# establish overall class to do tracking
-	curve_centers = tracker(Mywindow_width = window_width, Mywindow_height = window_height, Mymargin = 25, My_ym = 10/720, My_xm = 4/384, Mysmooth_factor = 15)	
+	curve_centers = tracker(Mywindow_width = window_width, Mywindow_height = window_height, Mymargin = 25, My_ym = 10/720, My_xm = 4/500, Mysmooth_factor = 15)	
 
 	window_centroids = curve_centers.find_window_centroids(warped)
 
@@ -135,7 +189,7 @@ def process_image(image):
 	# Draw the results
 	template = np.array(r_points+l_points,np.uint8) # add l, r window pixels
 	zero_channel = np.zeros_like(template) # create zero color channel
-	template = np.array(cv2.merge((zero_channel,template,zero_channel)),np.uint8) # make window pixels green
+	template = np.array(cv2.merge((zero_channel,template,zero_channel)),np.uint8)# make window pixels green
 	warpage = np.array(cv2.merge((warped,warped,warped)),np.uint8) # make original road pixels 3 color channels
 	result = cv2.addWeighted(warpage, 1, template, 0.5, 0.0) # overlay the original road image with window results
 
