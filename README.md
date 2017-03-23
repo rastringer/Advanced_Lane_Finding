@@ -1,4 +1,4 @@
-##Writeup 
+## Writeup 
 [//]: # (Image References)
 
 [image1]: ./camera_cal/calibration1.jpg "Distorted"
@@ -15,9 +15,9 @@
 [image12]:  ./test_images/road_warped0.jpg "Lane Curvature"
 [image13]:  ./test_images/road_warped1.jpg "Lane Curvature"
 
-###Writeup / README
+### Writeup / README
 
-###Camera Calibration
+### Camera Calibration
 
 The 'camera_cal' folder contais a camera_cal.py file to 
 distort the images and learn the distortion coefficients to employ with OpenCV's 'cv2.undistort()' function.
@@ -33,7 +33,7 @@ Undistorted
 ![alt text][image2]
 
 
-###Pipeline (single images)
+### Pipeline (single images)
 
 We can now apply the distortion to one of the test images from the road lane we are interested in for this project. Here's the original image:
 
@@ -43,7 +43,7 @@ Here's the undistorted image. Notice the view of the white car to the right of t
 
 ![alt text][image4]
 
-###Binary color transform
+### Binary color transform
 
 To process the test images into thresholded binary images, I use a combination of color and gradient threshold methods. These techniques take us beyond a simple edge detection and allow us to find which lines are more likely to be lanes based on their length and curvature.
 To this end, we use Sobel operators to take the derivative of the image in the x or y direction.
@@ -230,15 +230,15 @@ Overlaying curvature onto image
 ![alt text][image13]
 
 
-###Pipeline (video)
+### Pipeline (video)
 
-####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
+#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
 Here's a [link to my video result](./output1_tracked.mp4)
 
 ---
 
-###Discussion
+### Discussion
  
 While the pipeline works well on the video shown, the lanes are generally progressing forwards and to the left. Further work and flexibility will be necessary for the algorithm to accurately pick up quickly changing right and left swerves in lines on the road. 
 
